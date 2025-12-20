@@ -23,7 +23,6 @@ def api_signup():
         auth_col = db.auth_teachers
         # Add additional teacher-specific fields
         employee_id = data.get('employeeId')
-        department = data.get('department')
         
         if not employee_id:
             return jsonify({"success": False, "error": "Employee ID required for teachers"}), 400
@@ -53,7 +52,6 @@ def api_signup():
     if user_type == 'teacher':
         user_doc.update({
             "employeeId": employee_id,
-            "department": department,
             "role": "teacher"
         })
     
@@ -120,7 +118,6 @@ def api_signin():
     if user_type == 'teacher':
         user_info.update({
             "employeeId": user.get('employeeId'),
-            "department": user.get('department'),
             "name": user['username']  # Use username as display name for teachers
         })
         
@@ -136,7 +133,6 @@ def api_signin():
             user_info.update({
                 "studentId": student_record.get('studentId'),
                 "studentName": student_record.get('studentName'),
-                "department": student_record.get('department'),
                 "hasStudentRecord": True
             })
 
@@ -220,7 +216,6 @@ def switch_user_role():
     if target_type == 'teacher':
         user_info.update({
             "employeeId": target_user.get('employeeId'),
-            "department": target_user.get('department')
         })
     
     return jsonify({

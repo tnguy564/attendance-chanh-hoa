@@ -17,21 +17,40 @@ export default function DemoSessionPage() {
   const [form, setForm] = useState({
     date: "",
     subject: "",
-    department: "",
-    year: "",
-    division: "",
   });
-
-  const departments = ["Computer Science", "IT", "Electronics", "Mechanical", "Civil"];
-  const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-  const divisions = ["A", "B", "C", "D"];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const endSessionAndNavigate = async () => {
+    // If a session exists, close it on the backend
+    if (sessionId) {
+      try {
+        setStatus("Closing session...");
+        const res = await fetch("http://localhost:5000/api/attendance/end_session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId }),
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          console.log("Session ended successfully:", data.statistics);
+        }
+      } catch (err) {
+        console.error("Error ending session:", err);
+      }
+    }
+  
+    // Determine navigation path based on user role
+    const userType = localStorage.getItem("userType");
+    const targetPath = userType === "teacher" ? "/teacher/dashboard" : "/dashboard";
+    router.push(targetPath);
+  };
+
   const createSession = async () => {
-    if (!form.date || !form.subject || !form.department || !form.year || !form.division) {
+    if (!form.date || !form.subject) {
       setStatus("Please fill all fields");
       return;
     }
@@ -62,12 +81,6 @@ export default function DemoSessionPage() {
       // Build payload: include session_id when available, otherwise include filters for demo recognition
       const payload: any = { image: imageDataUrl };
       if (sessionId) payload.session_id = sessionId;
-      else {
-        // include optional filters from the form for candidate narrowing
-        if (form.department) payload.department = form.department;
-        if (form.year) payload.year = form.year;
-        if (form.division) payload.division = form.division;
-      }
 
       try {
         const res = await fetch("http://localhost:5000/api/attendance/real-mark", {
@@ -195,7 +208,7 @@ export default function DemoSessionPage() {
               )}
 
               <button
-                onClick={() => router.push("/teacher/dashboard")}
+                onClick={endSessionAndNavigate} // Changed this
                 className="px-6 py-3 rounded-lg font-semibold bg-blue-100 hover:bg-blue-200 text-blue-700 border-2 border-blue-300 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md hover:-translate-y-0.5"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -263,53 +276,6 @@ export default function DemoSessionPage() {
                       onChange={handleChange}
                       className="w-full p-3 rounded-lg bg-white/60 border border-gray-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     />
-                  </div>
-
-                  <div>
-                    <label className="text-gray-700 text-sm mb-2 block font-medium">Department</label>
-                    <select 
-                      name="department" 
-                      value={form.department} 
-                      onChange={handleChange}
-                      className="w-full p-3 rounded-lg bg-white/60 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map(d => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-gray-700 text-sm mb-2 block font-medium">Year</label>
-                      <select 
-                        name="year" 
-                        value={form.year} 
-                        onChange={handleChange}
-                        className="w-full p-3 rounded-lg bg-white/60 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                      >
-                        <option value="">Select Year</option>
-                        {years.map(y => (
-                          <option key={y} value={y}>{y}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-gray-700 text-sm mb-2 block font-medium">Division</label>
-                      <select 
-                        name="division" 
-                        value={form.division} 
-                        onChange={handleChange}
-                        className="w-full p-3 rounded-lg bg-white/60 border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                      >
-                        <option value="">Select Division</option>
-                        {divisions.map(d => (
-                          <option key={d} value={d}>{d}</option>
-                        ))}
-                      </select>
-                    </div>
                   </div>
 
                   <button 

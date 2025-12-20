@@ -7,14 +7,11 @@ attendance_bp = Blueprint("attendance", __name__)
 # ------------------------- GET ATTENDANCE -------------------------
 @attendance_bp.route('/api/attendance', methods=['GET'])
 def get_attendance():
-    db = current_app.config.get("DB")
+    db = current_app.config.get("ATTENDANCE_DB")
     attendance_col = db.attendance_records
     students_col = db.students
 
     date = request.args.get('date')
-    department = request.args.get('department')
-    year = request.args.get('year')
-    division = request.args.get('division')
     subject = request.args.get('subject')
     student_id = request.args.get('student_id')
 
@@ -22,18 +19,12 @@ def get_attendance():
         # Query attendance collection
         query = {}
         if date: query["date"] = date
-        if department: query["department"] = department
-        if year: query["year"] = year
-        if division: query["division"] = division
         if subject: query["subject"] = subject
 
         attendance_doc = attendance_col.find_one(query)
 
         # Build roster from students collection for given class filters
         roster_filter = {}
-        if department: roster_filter["department"] = department
-        if year: roster_filter["year"] = year
-        if division: roster_filter["division"] = division
 
         roster = list(students_col.find(roster_filter)) if roster_filter else []
 
@@ -78,9 +69,6 @@ def get_attendance():
                     "studentName": student.get("studentName") or student.get("student_name"),
                     "date": str(attendance_doc.get("date")) if attendance_doc else str(date),
                     "subject": str(attendance_doc.get("subject")) if attendance_doc else str(subject),
-                    "department": str(attendance_doc.get("department")) if attendance_doc else str(department),
-                    "year": str(attendance_doc.get("year")) if attendance_doc else str(year),
-                    "division": str(attendance_doc.get("division")) if attendance_doc else str(division),
                     "status": "present" if present else "absent",
                     "markedAt": marked_at
                 })
@@ -107,9 +95,6 @@ def get_attendance():
                     "studentName": s.get("student_name"),
                     "date": str(attendance_doc.get("date")),
                     "subject": str(attendance_doc.get("subject")),
-                    "department": str(attendance_doc.get("department")),
-                    "year": str(attendance_doc.get("year")),
-                    "division": str(attendance_doc.get("division")),
                     "status": "present" if s.get("present") else "absent",
                     "markedAt": marked
                 })
@@ -144,18 +129,12 @@ def export_attendance():
     students_col = db.students
 
     date = request.args.get('date')
-    department = request.args.get('department')
-    year = request.args.get('year')
-    division = request.args.get('division')
     subject = request.args.get('subject')
 
     try:
         # Get attendance doc
         query = {}
         if date: query["date"] = date
-        if department: query["department"] = department
-        if year: query["year"] = year
-        if division: query["division"] = division
         if subject: query["subject"] = subject
 
         attendance_doc = attendance_col.find_one(query)
@@ -167,9 +146,6 @@ def export_attendance():
 
         # Get all students in that class
         student_filter = {}
-        if department: student_filter["department"] = department
-        if year: student_filter["year"] = year
-        if division: student_filter["division"] = division
 
         students = list(students_col.find(student_filter))
         export_data = []

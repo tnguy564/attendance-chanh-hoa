@@ -9,6 +9,7 @@ interface AttendanceRecord {
   _id: string;
   studentId: string;
   studentName: string;
+  subject: string;
   date: string;
   time: string;
   status: "present" | "absent";
@@ -20,9 +21,6 @@ export default function ViewAttendance() {
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const [filterDepartment, setFilterDepartment] = useState("");
-  const [filterYear, setFilterYear] = useState("");
-  const [filterDivision, setFilterDivision] = useState("");
   const [filterSubject, setFilterSubject] = useState("");
   const [filterStudentId, setFilterStudentId] = useState("");
   const [stats, setStats] = useState({
@@ -34,18 +32,10 @@ export default function ViewAttendance() {
   const [searched, setSearched] = useState(false);
 
   const fetchAttendanceData = async () => {
-    if (!selectedDate && !filterDepartment) {
-      alert("Please select at least one filter.");
-      return;
-    }
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (selectedDate) params.set("date", selectedDate);
-      if (filterDepartment) params.set("department", filterDepartment);
-      if (filterYear) params.set("year", filterYear);
-      if (filterDivision) params.set("division", filterDivision);
-      if (filterSubject) params.set("subject", filterSubject);
       if (filterStudentId) params.set("student_id", filterStudentId);
 
       const res = await fetch(`http://127.0.0.1:5000/api/attendance?${params.toString()}`);
@@ -63,6 +53,7 @@ export default function ViewAttendance() {
           _id: record.studentId || `row-${idx}`,
           studentId: record.studentId || record.student_id || "-",
           studentName: record.studentName || record.student_name || "-",
+          subject: record.subject || filterSubject || "-", // Add this mapping
           date: record.date || data.date || selectedDate,
           time: record.markedAt || record.time || "-",
           status: record.status || "present",
@@ -83,10 +74,6 @@ export default function ViewAttendance() {
     try {
       const params = new URLSearchParams();
       if (selectedDate) params.set("date", selectedDate);
-      if (filterDepartment) params.set("department", filterDepartment);
-      if (filterYear) params.set("year", filterYear);
-      if (filterDivision) params.set("division", filterDivision);
-      if (filterSubject) params.set("subject", filterSubject);
 
       const res = await fetch(`http://127.0.0.1:5000/api/attendance/export?${params.toString()}`);
       const raw = await res.text();
@@ -120,8 +107,15 @@ export default function ViewAttendance() {
             <p className="text-gray-600">View and manage student attendance data</p>
           </div>
           <button
-            onClick={() => router.push("/dashboard")}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            onClick={() => {
+              const userType = localStorage.getItem("userType");
+              if (userType === "teacher") {
+                router.push("/teacher/dashboard");
+              } else {
+                router.push("/dashboard");
+              }
+            }}            
+          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
           >
             Back to Dashboard
           </button>
@@ -141,33 +135,6 @@ export default function ViewAttendance() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                <select
-                  value={filterYear}
-                  onChange={(e) => setFilterYear(e.target.value)}
-                  className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Years</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Division</label>
-                <select
-                  value={filterDivision}
-                  onChange={(e) => setFilterDivision(e.target.value)}
-                  className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Divisions</option>
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                </select>
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                 <input
                   value={filterSubject}
@@ -184,20 +151,6 @@ export default function ViewAttendance() {
                   placeholder="Student Id"
                   className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                <select
-                  value={filterDepartment}
-                  onChange={(e) => setFilterDepartment(e.target.value)}
-                  className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Departments</option>
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="IT">IT</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Mechanical">Mechanical</option>
-                </select>
               </div>
             </div>
             <div className="flex gap-4">
@@ -266,6 +219,9 @@ export default function ViewAttendance() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Subject
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Student ID
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -288,6 +244,9 @@ export default function ViewAttendance() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {attendanceData.map((record) => (
                     <tr key={record._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {record.subject}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {record.studentId}
                       </td>

@@ -31,9 +31,9 @@ def text_to_speech(user_text):
 
 haarcasecade_path = "haarcascade_frontalface_default.xml"
 trainimagelabel_path = (
-    "./TrainingImageLabel/Trainner.yml"
+    "./TrainingImageLabel/Trainer.yml"
 )
-trainimage_path = "/TrainingImage"
+trainimage_path = "./TrainingImage/"
 if not os.path.exists(trainimage_path):
     os.makedirs(trainimage_path)
 
@@ -50,7 +50,7 @@ dialog_text = "Are you sure want to close?"
 window.configure(background="#1c1c1c")  # Dark theme
 
 
-# to destroy screen
+# to deatroy screen
 def del_sc1():
     sc1.destroy()
 
@@ -67,7 +67,7 @@ def err_screen():
     tk.Label(
         sc1,
         text="Enrollment & Name required!!!",
-        fg="yellow",
+        fg="black",
         bg="#1c1c1c",  # Dark background for the error window
         font=("Verdana", 16, "bold"),
     ).pack()
@@ -75,7 +75,7 @@ def err_screen():
         sc1,
         text="OK",
         command=del_sc1,
-        fg="yellow",
+        fg="black",
         bg="#333333",  # Darker button color
         width=9,
         height=1,
@@ -100,7 +100,7 @@ l1.place(x=470, y=10)
 
 
 titl = tk.Label(
-    window, text="CLASS VISION", bg="#1c1c1c", fg="yellow", font=("Verdana", 27, "bold"),
+    window, text="CLASS VISION", bg="#1c1c1c", fg="white", font=("Verdana", 27, "bold"),
 )
 titl.place(x=525, y=12)
 
@@ -108,7 +108,7 @@ a = tk.Label(
     window,
     text="Welcome to CLASS VISION",
     bg="#1c1c1c",  # Dark background for the main text
-    fg="yellow",  # Bright yellow text color
+    fg="white",
     bd=10,
     font=("Verdana", 35, "bold"),
 )
@@ -153,7 +153,7 @@ def TakeImageUI():
         ImageUI,
         text="Enter the details",
         bg="#1c1c1c",  # Dark background for the details label
-        fg="yellow",  # Bright yellow text color
+        fg="black",
         bd=10,
         font=("Verdana", 24, "bold"),
     )
@@ -162,11 +162,11 @@ def TakeImageUI():
     # ER no
     lbl1 = tk.Label(
         ImageUI,
-        text="Enrollment No",
+        text="ID",
         width=10,
         height=2,
         bg="#1c1c1c",
-        fg="yellow",
+        fg="black",
         bd=5,
         relief=RIDGE,
         font=("Verdana", 14),
@@ -178,7 +178,7 @@ def TakeImageUI():
         bd=5,
         validate="key",
         bg="#333333",  # Dark input background
-        fg="yellow",  # Bright text color for input
+        fg="white",  # Bright text color for input
         relief=RIDGE,
         font=("Verdana", 18, "bold"),
     )
@@ -192,7 +192,7 @@ def TakeImageUI():
         width=10,
         height=2,
         bg="#1c1c1c",
-        fg="yellow",
+        fg="black",
         bd=5,
         relief=RIDGE,
         font=("Verdana", 14),
@@ -203,7 +203,7 @@ def TakeImageUI():
         width=17,
         bd=5,
         bg="#333333",  # Dark input background
-        fg="yellow",  # Bright text color for input
+        fg="white",  # Bright text color for input
         relief=RIDGE,
         font=("Verdana", 18, "bold"),
     )
@@ -215,7 +215,7 @@ def TakeImageUI():
         width=10,
         height=2,
         bg="#1c1c1c",
-        fg="yellow",
+        fg="black",
         bd=5,
         relief=RIDGE,
         font=("Verdana", 14),
@@ -229,7 +229,7 @@ def TakeImageUI():
         height=2,
         bd=5,
         bg="#333333",  # Dark background for messages
-        fg="yellow",  # Bright text color for messages
+        fg="white",  # Bright text color for messages
         relief=RIDGE,
         font=("Verdana", 14, "bold"),
     )
@@ -259,7 +259,7 @@ def TakeImageUI():
         bd=10,
         font=("Verdana", 18, "bold"),
         bg="#333333",  # Dark background for the button
-        fg="yellow",  # Bright text color for the button
+        fg="black",  # Bright text color for the button
         height=2,
         width=12,
         relief=RIDGE,
@@ -283,7 +283,7 @@ def TakeImageUI():
         bd=10,
         font=("Verdana", 18, "bold"),
         bg="#333333",  # Dark background for the button
-        fg="yellow",  # Bright text color for the button
+        fg="black",  # Bright text color for the button
         height=2,
         width=12,
         relief=RIDGE,
@@ -298,7 +298,7 @@ r = tk.Button(
     bd=10,
     font=("Verdana", 16),
     bg="black",
-    fg="yellow",
+    fg="black",
     height=2,
     width=17,
 )
@@ -316,7 +316,7 @@ r = tk.Button(
     bd=10,
     font=("Verdana", 16),
     bg="black",
-    fg="yellow",
+    fg="black",
     height=2,
     width=17,
 )
@@ -334,7 +334,7 @@ r = tk.Button(
     bd=10,
     font=("Verdana", 16),
     bg="black",
-    fg="yellow",
+    fg="black",
     height=2,
     width=17,
 )
@@ -346,7 +346,7 @@ r = tk.Button(
     command=quit,
     font=("Verdana", 16),
     bg="black",
-    fg="yellow",
+    fg="black",
     height=2,
     width=17,
 )

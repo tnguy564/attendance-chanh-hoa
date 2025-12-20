@@ -26,15 +26,7 @@ def get_students():
         if user_type == 'student':
             query = {"email": user_email}
             
-            # Get query parameters for additional filtering
-            department = request.args.get('department', '')
-            year = request.args.get('year', '')
             search = request.args.get('search', '')
-            
-            if department:
-                query['department'] = department
-            if year:
-                query['year'] = year
             if search:
                 query['$or'] = [
                     {'studentName': {'$regex': search, '$options': 'i'}},
@@ -166,9 +158,6 @@ def update_student(student_id):
         update_data = {
             "studentName": data.get("studentName", student.get("studentName")),
             "studentId": data.get("studentId", student.get("studentId")),
-            "department": data.get("department", student.get("department")),
-            "year": data.get("year", student.get("year")),
-            "division": data.get("division", student.get("division")),
             "semester": data.get("semester", student.get("semester")),
             "phoneNumber": data.get("phoneNumber", student.get("phoneNumber")),
             "updated_at": time.time(),
@@ -279,20 +268,11 @@ def get_all_students_admin():
             }), 403
         
         # Get query parameters for filtering
-        department = request.args.get('department', '')
-        year = request.args.get('year', '')
-        division = request.args.get('division', '')
         student_id = request.args.get('studentId', '')
         search = request.args.get('search', '')
         
         # Build query
         query = {}
-        if department:
-            query['department'] = department
-        if year:
-            query['year'] = year
-        if division:
-            query['division'] = division
         if student_id:
             query['studentId'] = {'$regex': student_id, '$options': 'i'}
         if search:
@@ -336,9 +316,6 @@ def search_students_teacher():
         # Get search parameters
         student_id = request.args.get('studentId', '').strip()
         student_name = request.args.get('studentName', '').strip()
-        department = request.args.get('department', '').strip()
-        year = request.args.get('year', '').strip()
-        division = request.args.get('division', '').strip()
         
         # Build query
         query = {}
@@ -348,15 +325,7 @@ def search_students_teacher():
         
         if student_name:
             query['studentName'] = {'$regex': student_name, '$options': 'i'}
-        
-        if department:
-            query['department'] = department
-            
-        if year:
-            query['year'] = year
-            
-        if division:
-            query['division'] = division
+    
         
         # Execute search (limit to 50 results for performance)
         students = list(students_col.find(
@@ -458,10 +427,6 @@ def update_student_teacher(student_db_id):
         update_data = {
             "studentName": data.get("studentName", student.get("studentName")),
             "studentId": data.get("studentId", student.get("studentId")),
-            "department": data.get("department", student.get("department")),
-            "year": data.get("year", student.get("year")),
-            "division": data.get("division", student.get("division")),
-            "semester": data.get("semester", student.get("semester")),
             "email": data.get("email", student.get("email")),  # Teachers can update email
             "phoneNumber": data.get("phoneNumber", student.get("phoneNumber")),
             "updated_at": time.time(),
@@ -534,12 +499,7 @@ def search_students():
             return jsonify({"success": False, "error": "Unauthorized"}), 403
         
         search_term = request.args.get('q', '')
-        department = request.args.get('department', '')
-        year = request.args.get('year', '')
         limit = int(request.args.get('limit', 10))
-        
-        if not search_term and not department and not year:
-            return jsonify({"success": False, "error": "Search term or filters required"}), 400
         
         # Build search query
         query = {}
@@ -554,11 +514,7 @@ def search_students():
                 {'studentId': {'$regex': search_term, '$options': 'i'}},
                 {'email': {'$regex': search_term, '$options': 'i'}}
             ]
-        
-        if department:
-            query['department'] = department
-        if year:
-            query['year'] = year
+    
         
         # Execute search
         students = list(students_col.find(
@@ -597,21 +553,6 @@ def get_student_stats():
         
         # Basic stats
         total_students = students_col.count_documents({})
-        
-        # Students by department
-        dept_pipeline = [
-            {"$group": {"_id": "$department", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}}
-        ]
-        dept_stats = list(students_col.aggregate(dept_pipeline))
-        
-        # Students by year
-        year_pipeline = [
-            {"$group": {"_id": "$year", "count": {"$sum": 1}}},
-            {"$sort": {"_id": 1}}
-        ]
-        year_stats = list(students_col.aggregate(year_pipeline))
-        
         # Students with face data
         face_registered = students_col.count_documents({"embedding": {"$exists": True, "$ne": None}})
         
@@ -619,9 +560,7 @@ def get_student_stats():
             "success": True,
             "stats": {
                 "total_students": total_students,
-                "face_registered": face_registered,
-                "by_department": dept_stats,
-                "by_year": year_stats
+                "face_registered": face_registered
             }
         })
         

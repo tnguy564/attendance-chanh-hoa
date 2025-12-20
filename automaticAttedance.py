@@ -13,11 +13,14 @@ import tkinter.font as font
 
 haarcasecade_path = "haarcascade_frontalface_default.xml"
 trainimagelabel_path = (
-    "TrainingImageLabel\\Trainner.yml"
+    "./TrainingImageLabel/Trainer.yml"
 )
-trainimage_path = "TrainingImage"
+trainimage_path = "./TrainingImage/"
+if not os.path.exists(trainimage_path):
+    os.makedirs(trainimage_path)
+
 studentdetail_path = (
-    "StudentDetails\\studentdetails.csv"
+    "./StudentDetails/studentdetails.csv"
 )
 attendance_path = "Attendance"
 # for choose subject and fill attendance
@@ -41,13 +44,13 @@ def subjectChoose(text_to_speech):
                     Notifica.configure(
                         text=e,
                         bg="black",
-                        fg="yellow",
+                        fg="black",
                         width=33,
                         font=("times", 15, "bold"),
                     )
                     Notifica.place(x=20, y=250)
                     text_to_speech(e)
-                facecasCade = cv2.CascadeClassifier(haarcasecade_path)
+                facecasCade = cv2.CascadeClassifier(cv2.data.haarcascades + haarcasecade_path)
                 df = pd.read_csv(studentdetail_path)
                 cam = cv2.VideoCapture(0)
                 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -138,7 +141,7 @@ def subjectChoose(text_to_speech):
                 Notifica.configure(
                     text=m,
                     bg="black",
-                    fg="yellow",
+                    fg="black",
                     width=33,
                     relief=RIDGE,
                     bd=5,
@@ -171,7 +174,7 @@ def subjectChoose(text_to_speech):
                                 root,
                                 width=10,
                                 height=1,
-                                fg="yellow",
+                                fg="black",
                                 font=("times", 15, " bold "),
                                 bg="black",
                                 text=row,
@@ -212,7 +215,7 @@ def subjectChoose(text_to_speech):
     Notifica = tk.Label(
         subject,
         text="Attendance filled Successfully",
-        bg="yellow",
+        bg="black",
         fg="black",
         width=33,
         height=2,
@@ -236,7 +239,7 @@ def subjectChoose(text_to_speech):
         bd=7,
         font=("times new roman", 15),
         bg="black",
-        fg="yellow",
+        fg="black",
         height=2,
         width=10,
         relief=RIDGE,
@@ -249,7 +252,7 @@ def subjectChoose(text_to_speech):
         width=10,
         height=2,
         bg="black",
-        fg="yellow",
+        fg="white",
         bd=5,
         relief=RIDGE,
         font=("times new roman", 15),
@@ -261,7 +264,7 @@ def subjectChoose(text_to_speech):
         width=15,
         bd=5,
         bg="black",
-        fg="yellow",
+        fg="white",
         relief=RIDGE,
         font=("times", 30, "bold"),
     )
@@ -274,7 +277,7 @@ def subjectChoose(text_to_speech):
         bd=7,
         font=("times new roman", 15),
         bg="black",
-        fg="yellow",
+        fg="black",
         height=2,
         width=12,
         relief=RIDGE,

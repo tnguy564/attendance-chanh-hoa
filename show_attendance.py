@@ -14,7 +14,7 @@ def subjectchoose(text_to_speech):
             text_to_speech(t)
     
         filenames = glob(
-            f"Attendance\\{Subject}\\{Subject}*.csv"
+            f"Attendance/{Subject}/{Subject}*.csv"
         )
         df = [pd.read_csv(f) for f in filenames]
         newdf = df[0]
@@ -43,7 +43,7 @@ def subjectchoose(text_to_speech):
                         root,
                         width=10,
                         height=1,
-                        fg="yellow",
+                        fg="black",
                         font=("times", 15, " bold "),
                         bg="black",
                         text=row,
@@ -95,7 +95,7 @@ def subjectchoose(text_to_speech):
         bd=7,
         font=("times new roman", 15),
         bg="black",
-        fg="yellow",
+        fg="black",
         height=2,
         width=10,
         relief=RIDGE,
@@ -108,7 +108,7 @@ def subjectchoose(text_to_speech):
         width=10,
         height=2,
         bg="black",
-        fg="yellow",
+        fg="white",
         bd=5,
         relief=RIDGE,
         font=("times new roman", 15),
@@ -120,7 +120,7 @@ def subjectchoose(text_to_speech):
         width=15,
         bd=5,
         bg="black",
-        fg="yellow",
+        fg="white",
         relief=RIDGE,
         font=("times", 30, "bold"),
     )
@@ -133,7 +133,7 @@ def subjectchoose(text_to_speech):
         bd=7,
         font=("times new roman", 15),
         bg="black",
-        fg="yellow",
+        fg="black",
         height=2,
         width=12,
         relief=RIDGE,

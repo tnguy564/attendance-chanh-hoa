@@ -29,19 +29,22 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
   const [cameraStatus, setCameraStatus] = useState<"loading" | "active" | "stopped">("stopped");
   const [cameraError, setCameraError] = useState<string>("");
 
-  const startCamera = async () => {
-    try {
-      setCameraStatus("loading");
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
-      });
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      setCameraStatus("active");
-    } catch (err) {
-      console.error("Camera error:", err);
-      setCameraError("Failed to access camera.");
-      setCameraStatus("stopped");
-    }
+    const startCamera = async () => {
+      try {
+        setCameraStatus("loading");
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+        });
+        if (videoRef.current) videoRef.current.srcObject = stream;
+        console.log(videoRef.current)
+        setCameraStatus("active");
+      } catch (err) {
+        console.error("Camera error:", err);
+        setCameraError("Failed to access camera.");
+        setCameraStatus("stopped");
+      }
+    console.log("camera started")
+
   };
 
   const stopCamera = () => {
@@ -50,6 +53,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     if (videoRef.current) videoRef.current.srcObject = null;
     if (intervalRef.current) clearInterval(intervalRef.current);
     setCameraStatus("stopped");
+    console.log("camera stopped")
   };
 
   const capture = () => {

@@ -21,10 +21,7 @@ import {
 interface StudentData {
   studentName: string;
   studentId: string;
-  department: string;
-  year: string;
-  division: string;
-  semester: string;
+  title: string;
   email: string;
   phoneNumber: string;
 }
@@ -34,10 +31,7 @@ export default function StudentRegistrationForm() {
   const [formData, setFormData] = useState<StudentData>({
     studentName: "",
     studentId: "",
-    department: "",
-    year: "",
-    division: "",
-    semester: "",
+    title: "",
     email: "",
     phoneNumber: ""
   });
@@ -68,14 +62,6 @@ export default function StudentRegistrationForm() {
       router.replace("/signin");
     }
   }, [router]);
-
-  const departments = [
-    "Computer Science", "Information Technology", "Electronics", 
-    "Mechanical", "Civil", "Electrical", "Chemical", "Biotechnology"
-  ];
-  const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-  const divisions = ["A", "B", "C", "D"];
-  const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
@@ -222,24 +208,9 @@ export default function StudentRegistrationForm() {
                     <div className="space-y-4">
                       <InputField name="studentName" value={formData.studentName} onChange={handleInputChange} icon={User} label="Full Name *" placeholder="Enter student's full name" />
                       <InputField name="studentId" value={formData.studentId} onChange={handleInputChange} icon={IdCard} label="Student ID *" placeholder="Enter unique student ID" />
+                      <InputField name="title" value={formData.title} onChange={handleInputChange} icon={IdCard} label="Title *" placeholder="Enter a title" />
                       <InputField name="email" value={formData.email} onChange={handleInputChange} icon={Mail} label="Email Address *" placeholder="Enter student's email" type="email" />
                       <InputField name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} icon={Phone} label="Phone Number *" placeholder="Enter 10-digit phone number" type="tel" />
-                    </div>
-                  </div>
-
-                  {/* Academic Details Card */}
-                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border-2 border-emerald-200 shadow-lg hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-lg">
-                        <GraduationCap className="w-5 h-5 text-white" />
-                      </div>
-                      <h3 className="text-xl font-bold text-slate-900">Academic Details</h3>
-                    </div>
-                    <div className="space-y-4">
-                      <SelectField name="department" value={formData.department} onChange={handleInputChange} icon={Building} label="Department *" options={departments} placeholder="Select Department" />
-                      <SelectField name="year" value={formData.year} onChange={handleInputChange} icon={Calendar} label="Year *" options={years} placeholder="Select Academic Year" />
-                      <SelectField name="division" value={formData.division} onChange={handleInputChange} icon={Users} label="Division *" options={divisions} placeholder="Select Division" prefix="Division " />
-                      <SelectField name="semester" value={formData.semester} onChange={handleInputChange} icon={BookOpen} label="Semester *" options={semesters} placeholder="Select Semester" prefix="Semester " />
                     </div>
                   </div>
                 </div>

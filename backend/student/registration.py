@@ -55,7 +55,7 @@ def register_student():
     students_col = db.students
 
     # Check required fields
-    required_fields = ['studentName', 'studentId', 'department', 'year', 'division', 'semester', 'email', 'phoneNumber', 'images']
+    required_fields = ['studentName', 'studentId', 'email', 'phoneNumber', 'images']
     for field in required_fields:
         if not data.get(field):
             return jsonify({"success": False, "error": f"{field} is required"}), 400
@@ -92,10 +92,6 @@ def register_student():
     student_data = {
         "studentId": data['studentId'],
         "studentName": data['studentName'],
-        "department": data['department'],
-        "year": data['year'],
-        "division": data['division'],
-        "semester": data['semester'],
         "email": data['email'],
         "phoneNumber": data['phoneNumber'],
         "status": "active",
@@ -112,9 +108,3 @@ def register_student():
 def get_student_count():
     db = current_app.config.get("DB")
     return jsonify({"success": True, "count": db.students.count_documents({})})
-
-@student_registration_bp.route('/api/students/departments', methods=['GET'])
-def get_departments():
-    db = current_app.config.get("DB")
-    departments = db.students.distinct("department")
-    return jsonify({"success": True, "departments": departments, "count": len(departments)})

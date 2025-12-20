@@ -24,18 +24,11 @@ interface Student {
   _id: string;
   studentId: string;
   studentName: string;
-  department: string;
-  year: string;
-  division: string;
-  semester: string;
   email: string;
   phoneNumber: string;
 }
 
 interface FilterOptions {
-  department: string;
-  year: string;
-  division: string;
   studentId: string;
   search: string;
 }
@@ -54,9 +47,6 @@ export default function UpdateStudentDetails() {
 
   // Teacher filter states
   const [filters, setFilters] = useState<FilterOptions>({
-    department: "",
-    year: "",
-    division: "",
     studentId: "",
     search: ""
   });
@@ -67,13 +57,6 @@ export default function UpdateStudentDetails() {
     [userType]
   );
 
-  const departments = [
-    "Computer Science", "Information Technology", "Electronics", 
-    "Mechanical", "Civil", "Electrical", "Chemical", "Biotechnology"
-  ];
-  const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-  const divisions = ["A", "B", "C", "D"];
-  const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
   useEffect(() => {
     // Auth + role check
@@ -141,16 +124,6 @@ export default function UpdateStudentDetails() {
   useEffect(() => {
     if (userType === "teacher" && allStudents.length > 0) {
       let filtered = allStudents;
-
-      if (filters.department) {
-        filtered = filtered.filter(s => s.department === filters.department);
-      }
-      if (filters.year) {
-        filtered = filtered.filter(s => s.year === filters.year);
-      }
-      if (filters.division) {
-        filtered = filtered.filter(s => s.division === filters.division);
-      }
       if (filters.studentId) {
         filtered = filtered.filter(s => s.studentId.toLowerCase().includes(filters.studentId.toLowerCase()));
       }
@@ -174,9 +147,6 @@ export default function UpdateStudentDetails() {
 
   const clearFilters = () => {
     setFilters({
-      department: "",
-      year: "",
-      division: "",
       studentId: "",
       search: ""
     });
@@ -223,10 +193,6 @@ export default function UpdateStudentDetails() {
         body: JSON.stringify({
           studentName: selectedStudent.studentName,
           studentId: selectedStudent.studentId,
-          department: selectedStudent.department,
-          year: selectedStudent.year,
-          division: selectedStudent.division,
-          semester: selectedStudent.semester,
           email: selectedStudent.email,
           phoneNumber: selectedStudent.phoneNumber,
           user_email: userEmail // Backup authorization
@@ -366,45 +332,6 @@ export default function UpdateStudentDetails() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
-                  <select
-                    name="department"
-                    value={filters.department}
-                    onChange={handleFilterChange}
-                    className="w-full bg-white/60 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                  >
-                    <option value="">All Departments</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <select
-                    name="year"
-                    value={filters.year}
-                    onChange={handleFilterChange}
-                    className="w-full bg-white/60 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                  >
-                    <option value="">All Years</option>
-                    {years.map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <select
-                    name="division"
-                    value={filters.division}
-                    onChange={handleFilterChange}
-                    className="w-full bg-white/60 border border-gray-200 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                  >
-                    <option value="">All Divisions</option>
-                    {divisions.map(div => (
-                      <option key={div} value={div}>Division {div}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
                   <input
                     name="studentId"
                     type="text"
@@ -479,10 +406,10 @@ export default function UpdateStudentDetails() {
                       >
                         <div className="font-medium text-gray-800 group-hover:text-blue-700 transition-colors">{student.studentName}</div>
                         <div className="text-sm text-gray-600">
-                          ID: {student.studentId} | {student.department}
+                          ID: {student.studentId}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {student.year} - Division {student.division} | {student.email}
+                          {student.email}
                         </div>
                       </div>
                       
@@ -599,72 +526,6 @@ export default function UpdateStudentDetails() {
                       <GraduationCap className="w-4 h-4 text-purple-600" />
                       Academic Information
                     </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          Department
-                        </label>
-                        <select
-                          name="department"
-                          value={selectedStudent.department}
-                          onChange={handleInputChange}
-                          className="w-full bg-white/70 border border-gray-200 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                          required
-                        >
-                          {departments.map(dept => (
-                            <option key={dept} value={dept}>{dept}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          Year
-                        </label>
-                        <select
-                          name="year"
-                          value={selectedStudent.year}
-                          onChange={handleInputChange}
-                          className="w-full bg-white/70 border border-gray-200 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                          required
-                        >
-                          {years.map(year => (
-                            <option key={year} value={year}>{year}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          Division
-                        </label>
-                        <select
-                          name="division"
-                          value={selectedStudent.division}
-                          onChange={handleInputChange}
-                          className="w-full bg-white/70 border border-gray-200 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                          required
-                        >
-                          {divisions.map(div => (
-                            <option key={div} value={div}>Division {div}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          Semester
-                        </label>
-                        <select
-                          name="semester"
-                          value={selectedStudent.semester}
-                          onChange={handleInputChange}
-                          className="w-full bg-white/70 border border-gray-200 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                          required
-                        >
-                          {semesters.map(sem => (
-                            <option key={sem} value={sem}>Semester {sem}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
                   </div>
 
                   <button

@@ -173,6 +173,7 @@ CORS(app)
 
 # Configure Flask app with database and model instances
 app.config["DB"] = db
+app.config["ATTENDANCE_DB"] = attendance_db
 app.config["COLLECTION_NAME"] = COLLECTION_NAME
 app.config["THRESHOLD"] = THRESHOLD
 app.config["ATTENDANCE_COLLECTION"] = attendance_collection

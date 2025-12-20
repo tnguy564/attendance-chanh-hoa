@@ -7,10 +7,6 @@ interface Student {
   _id: string;
   studentId: string;
   studentName: string;
-  department: string;
-  year: string;
-  division: string;
-  semester: string;
   email: string;
   phoneNumber: string;
   status?: string;
@@ -20,9 +16,6 @@ interface Student {
 
 interface SearchFilters {
   studentId: string;
-  department: string;
-  year: string;
-  division: string;
   studentName: string;
 }
 
@@ -46,20 +39,8 @@ export default function TeacherUpdateStudentDetails() {
 
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     studentId: "",
-    department: "",
-    year: "",
-    division: "",
     studentName: ""
   });
-
-  const departments = [
-    "Computer Science", "Information Technology", "Electronics", 
-    "Mechanical", "Civil", "Electrical", "Chemical", "Biotechnology"
-  ];
-  const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-  const divisions = ["A", "B", "C", "D"];
-  const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
-
   useEffect(() => {
     const checkAuthStatus = () => {
       try {
@@ -93,9 +74,6 @@ export default function TeacherUpdateStudentDetails() {
   const clearFilters = () => {
     setSearchFilters({
       studentId: "",
-      department: "",
-      year: "",
-      division: "",
       studentName: ""
     });
     setSearchResults([]);
@@ -209,10 +187,6 @@ export default function TeacherUpdateStudentDetails() {
         body: JSON.stringify({
           studentName: student.studentName,
           studentId: student.studentId,
-          department: student.department,
-          year: student.year,
-          division: student.division,
-          semester: student.semester,
           email: student.email,
           phoneNumber: student.phoneNumber
         }),
@@ -355,60 +329,6 @@ export default function TeacherUpdateStudentDetails() {
                 />
               </div>
 
-              {/* Department Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Department
-                </label>
-                <select
-                  name="department"
-                  value={searchFilters.department}
-                  onChange={handleFilterChange}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Departments</option>
-                  {departments.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Year Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Year
-                </label>
-                <select
-                  name="year"
-                  value={searchFilters.year}
-                  onChange={handleFilterChange}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Years</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Division Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Division
-                </label>
-                <select
-                  name="division"
-                  value={searchFilters.division}
-                  onChange={handleFilterChange}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Divisions</option>
-                  {divisions.map(div => (
-                    <option key={div} value={div}>Division {div}</option>
-                  ))}
-                </select>
-              </div>
-
               {/* Search Buttons */}
               <div className="space-y-2 pt-2">
                 <button
@@ -453,9 +373,6 @@ export default function TeacherUpdateStudentDetails() {
                     <div className="font-medium text-gray-800">{studentItem.studentName}</div>
                     <div className="text-sm text-gray-600">
                       ID: {studentItem.studentId}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {studentItem.department} • {studentItem.year} • Div {studentItem.division}
                     </div>
                   </div>
                 ))}
@@ -542,56 +459,6 @@ export default function TeacherUpdateStudentDetails() {
                   </div>
                 </div>
 
-                {/* Academic Information */}
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-3">Academic Information</h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <select
-                      name="department"
-                      value={student.department}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      {departments.map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                    <select
-                      name="year"
-                      value={student.year}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      {years.map(year => (
-                        <option key={year} value={year}>{year}</option>
-                      ))}
-                    </select>
-                    <select
-                      name="division"
-                      value={student.division}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      {divisions.map(div => (
-                        <option key={div} value={div}>Division {div}</option>
-                      ))}
-                    </select>
-                    <select
-                      name="semester"
-                      value={student.semester}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      {semesters.map(sem => (
-                        <option key={sem} value={sem}>Semester {sem}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-4">
