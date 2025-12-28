@@ -158,7 +158,8 @@ def update_student(student_id):
         update_data = {
             "studentName": data.get("studentName", student.get("studentName")),
             "studentId": data.get("studentId", student.get("studentId")),
-            "semester": data.get("semester", student.get("semester")),
+            "buddhaName": data.get("buddhaName", student.get("buddhaName")),
+            "role": data.get("role", student.get("role")),
             "phoneNumber": data.get("phoneNumber", student.get("phoneNumber")),
             "updated_at": time.time(),
             "updated_by": user_email,
@@ -279,6 +280,7 @@ def get_all_students_admin():
             query['$or'] = [
                 {'studentName': {'$regex': search, '$options': 'i'}},
                 {'studentId': {'$regex': search, '$options': 'i'}},
+                {'role': {'$regex': search, '$options': 'i'}},
                 {'email': {'$regex': search, '$options': 'i'}}
             ]
         
@@ -427,6 +429,8 @@ def update_student_teacher(student_db_id):
         update_data = {
             "studentName": data.get("studentName", student.get("studentName")),
             "studentId": data.get("studentId", student.get("studentId")),
+            "buddhaName": data.get("buddhaName", student.get("buddhaName")),
+            "role": data.get("role", student.get("role")),
             "email": data.get("email", student.get("email")),  # Teachers can update email
             "phoneNumber": data.get("phoneNumber", student.get("phoneNumber")),
             "updated_at": time.time(),
@@ -512,7 +516,8 @@ def search_students():
             query['$or'] = [
                 {'studentName': {'$regex': search_term, '$options': 'i'}},
                 {'studentId': {'$regex': search_term, '$options': 'i'}},
-                {'email': {'$regex': search_term, '$options': 'i'}}
+                {'email': {'$regex': search_term, '$options': 'i'}},
+                {'role': {'$regex': search_term, '$options': 'i'}}
             ]
     
         

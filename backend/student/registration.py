@@ -55,7 +55,7 @@ def register_student():
     students_col = db.students
 
     # Check required fields
-    required_fields = ['studentName', 'studentId', 'email', 'phoneNumber', 'images']
+    required_fields = ['studentName', 'studentId', 'buddhaName', 'role', 'email', 'phoneNumber', 'images']
     for field in required_fields:
         if not data.get(field):
             return jsonify({"success": False, "error": f"{field} is required"}), 400
@@ -92,6 +92,8 @@ def register_student():
     student_data = {
         "studentId": data['studentId'],
         "studentName": data['studentName'],
+        "buddhaName": data['buddhaName'],
+        "role": data['role'],
         "email": data['email'],
         "phoneNumber": data['phoneNumber'],
         "status": "active",

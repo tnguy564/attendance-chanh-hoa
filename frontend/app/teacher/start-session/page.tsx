@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, ArrowLeft, Play, Square, User, Calendar, BookOpen, GraduationCap, Users, CheckCircle2 } from "lucide-react";
 import CameraCapture, { FaceData } from "../../components/CameraCapture";
@@ -13,6 +14,40 @@ export default function DemoSessionPage() {
   const [status, setStatus] = useState("");
   const [facesData, setFacesData] = useState<FaceData[]>([]);
   const [recognizedStudents, setRecognizedStudents] = useState<string[]>([]);
+  const [confirmText, setConfirmText] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (sessionId) {
+        e.preventDefault();
+        e.returnValue = ""; 
+      }
+    };
+  
+    // Attach the listener
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  
+    // Clean up the listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [sessionId]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+  
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    }
+  };
 
   const [form, setForm] = useState({
     date: "",
@@ -23,8 +58,28 @@ export default function DemoSessionPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    }
+  };
+
   const endSessionAndNavigate = async () => {
-    // If a session exists, close it on the backend
+    if (confirmText.toLowerCase() !== "confirm") {
+      setStatus("Please type 'confirm' to finalize.");
+      return;
+    }
+    // 1. Show the confirmation dialog
+    const confirmed = window.confirm("Are you sure you want to end the session? This will finalize the attendance records.");
+    if (!confirmed) {
+      return
+    }
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+    // 4. Proceed with ending the session on the backend
     if (sessionId) {
       try {
         setStatus("Closing session...");
@@ -43,7 +98,7 @@ export default function DemoSessionPage() {
       }
     }
   
-    // Determine navigation path based on user role
+    // 5. Navigate away
     const userType = localStorage.getItem("userType");
     const targetPath = userType === "teacher" ? "/teacher/dashboard" : "/dashboard";
     router.push(targetPath);
@@ -74,6 +129,8 @@ export default function DemoSessionPage() {
       console.error(err);
       setStatus("❌ Error creating session");
     }
+    toggleFullScreen();
+    console.log("Starting full screen")
   };
 
   const handleRecognize = useCallback(
@@ -109,12 +166,13 @@ export default function DemoSessionPage() {
         setFacesData([]);
       }
     },
-    [sessionId, form]
+    [sessionId]
+    // [sessionId, form]
   );
 
   const handleStartRecognition = () => {
     setRecognitionStarted(true);
-    setStatus("Starting live recognition...");
+    setStatus("Turn on camera when ready");
   };
 
   const handleStopRecognition = () => {
@@ -122,35 +180,33 @@ export default function DemoSessionPage() {
     setStatus("Recognition stopped");
   };
 
+  
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Animated Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-4 -right-4 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
-        <div className="absolute -bottom-8 -left-4 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style={{ animationDelay: "2s" }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style={{ animationDelay: "4s" }}></div>
-      </div>
+    <div className="min-h-screen bg-white">
 
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 relative z-10">
+      <header className="bg-[#212121]">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left Section */}
             <div className="flex items-center gap-4">
+            {!sessionId && (
               <button
                 onClick={() => router.push("/teacher/dashboard")}
                 className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors group"
               >
                 <ArrowLeft className="w-6 h-6 text-gray-600 group-hover:text-gray-800 transition-colors" />
               </button>
+              )}
               
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-r from-green-100 to-emerald-100 rounded-lg">
                   <Camera className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Attendance Session</h1>
-                  <p className="text-gray-600 text-sm">Live face recognition attendance</p>
+                  <h1 className="text-2xl font-bold text-white">Attendance Session</h1>
+                  <p className="text-white text-sm">Live face recognition attendance</p>
                 </div>
               </div>
             </div>
@@ -180,41 +236,41 @@ export default function DemoSessionPage() {
       <div className="px-6 py-4 border-b border-gray-200/50 bg-white/60 backdrop-blur-lg relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            {/* Left Controls */}
-            <div className="flex flex-wrap gap-3">
-              {sessionId && recognitionStarted && (
-                <button
-                  onClick={handleStopRecognition}
-                  className="px-6 py-3 rounded-lg font-semibold bg-red-100 hover:bg-red-200 text-red-700 border-2 border-red-300 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md hover:-translate-y-0.5"
-                >
-                  <Square className="w-5 h-5" />
-                  Stop Recognition
-                </button>
-              )}
-
-              {/* Demo recognition: start without creating a session */}
-              {!sessionId && !recognitionStarted && (
-                <button
-                  onClick={() => {
-                    setSessionActive(false);
-                    setRecognitionStarted(true);
-                    setStatus("Starting demo recognition...");
-                  }}
-                  className="px-6 py-3 rounded-lg font-semibold bg-green-100 hover:bg-green-200 text-green-700 border-2 border-green-300 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md hover:-translate-y-0.5"
-                >
-                  <Play className="w-5 h-5" />
-                  Start Demo Recognition
-                </button>
-              )}
-
-              <button
-                onClick={endSessionAndNavigate} // Changed this
-                className="px-6 py-3 rounded-lg font-semibold bg-blue-100 hover:bg-blue-200 text-blue-700 border-2 border-blue-300 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md hover:-translate-y-0.5"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Back to Dashboard
-              </button>
-            </div>
+      {/* Left Controls */}
+      <div className="flex flex-wrap gap-3 items-center">
+        {sessionId && (
+          <div className="flex items-center gap-2 bg-white/50 p-1 rounded-lg border border-blue-200">
+            <input
+              type="text"
+              placeholder="Type 'confirm'"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              className="text-black font-medium px-3 py-2 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
+            />
+            <button
+              onClick={endSessionAndNavigate}
+              disabled={confirmText.toLowerCase() !== "confirm"}
+              className={`px-3 py-1 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md 
+                ${confirmText.toLowerCase() === "confirm" 
+                  ? "bg-blue-600 text-white hover:bg-blue-700 border-2 border-blue-700 hover:-translate-y-0.5" 
+                  : "bg-gray-200 text-gray-400 border-2 border-gray-300 cursor-not-allowed"}`}
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              Finalize Session
+            </button>
+          </div>
+        )}
+        {sessionId && !isFullscreen && (
+        <button
+          onClick={handleToggleFullscreen}
+          className="p-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-700 border border-amber-300 transition-all flex items-center gap-2 text-sm font-medium"
+          title="Go Fullscreen"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          Maximize
+        </button>
+      )}
+      </div>
 
             {/* Right Stats */}
             <div className="flex flex-wrap gap-4 text-sm">
@@ -317,7 +373,7 @@ export default function DemoSessionPage() {
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        Click "Create Session" to initialize
+                        Click &quot;Create Session&quot; to initialize
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>

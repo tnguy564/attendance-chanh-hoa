@@ -191,9 +191,13 @@ def create_session():
         for s in students:
             sid = s.get("studentId") or s.get("student_id")
             name = s.get("studentName") or s.get("student_name")
+            buddha_name = s.get("buddhaName") or s.get("buddha_name")
+            role = s.get("role")
             session_doc["students"].append({
                 "student_id": sid,
                 "student_name": name,
+                "buddha_name": buddha_name,
+                "role": role,
                 "present": False,
                 "marked_at": None
             })
@@ -241,6 +245,8 @@ def end_session():
         for s in all_students:
             sid = s.get("studentId") or s.get("student_id")
             sname = s.get("studentName") or s.get("student_name")
+            sbname = s.get("buddhaName")  or s.get("buddha_name")
+            role = s.get("role")
             
             if sid not in present_students:
                 # Update existing entry or create new absent entry
@@ -257,6 +263,8 @@ def end_session():
                             "students": {
                                 "student_id": sid, 
                                 "student_name": sname, 
+                                "buddha_name": sbname,
+                                "role": role,
                                 "present": False, 
                                 "marked_at": None
                             }

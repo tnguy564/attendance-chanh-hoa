@@ -1,4 +1,5 @@
 "use client";
+import mainLogo from "../gdptlogo.jpg";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,7 @@ export default function SignUpPage() {
     username: "",
     email: "",
     password: "",
-    userType: "student"
+    userType: "teacher"
   });
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -69,32 +70,15 @@ export default function SignUpPage() {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push("/")}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all border-2 border-slate-300 hover:scale-105 transform duration-300 shadow-md hover:shadow-lg"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span className="font-medium">Back to Home</span>
-              </button>
               
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg">
-                  <UserPlus className="w-6 h-6 text-white" />
-                </div>
+              <img  src={mainLogo.src} className="w-20 h-25 object-contain"/>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Join Us Today</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Sign Up</h1>
                   <p className="text-slate-600 text-sm font-medium">Create your account to get started</p>
                 </div>
               </div>
             </div>
-
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all border-2 border-slate-300 hover:scale-105 transform duration-300 shadow-md hover:shadow-lg"
-            >
-              <Home className="w-5 h-5" />
-              <span className="font-medium">Home</span>
-            </button>
           </div>
         </div>
       </header>
@@ -104,39 +88,6 @@ export default function SignUpPage() {
           {/* Sign Up Form */}
           <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border-2 border-slate-200 shadow-xl mt-8">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* User Type Selection */}
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                <label className="block text-slate-700 text-sm font-semibold mb-3 flex items-center gap-2">
-                  <User className="w-4 h-4 text-purple-600" />
-                  Sign up as:
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, userType: "student" }))}
-                    className={`p-3 rounded-xl border-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold hover:scale-105 ${
-                      formData.userType === "student" 
-                        ? "bg-blue-50 border-blue-300 text-blue-700 shadow-lg" 
-                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                    }`}
-                  >
-                    <GraduationCap className="w-4 h-4" />
-                    Student
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, userType: "teacher" }))}
-                    className={`p-3 rounded-xl border-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold hover:scale-105 ${
-                      formData.userType === "teacher" 
-                        ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-lg" 
-                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                    }`}
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    Teacher
-                  </button>
-                </div>
-              </div>
 
               {/* Username Input */}
               <div>
@@ -213,7 +164,7 @@ export default function SignUpPage() {
                 ) : (
                   <>
                     <UserPlus className="w-5 h-5" />
-                    Create {formData.userType === 'teacher' ? 'Teacher' : 'Student'} Account
+                    Create Admin Account
                   </>
                 )}
               </button>
@@ -236,19 +187,12 @@ export default function SignUpPage() {
             <div className="mt-6 pt-6 border-t border-slate-200 text-center">
               <button
                 onClick={() => router.push("/signin")}
-                className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 transition-colors font-semibold hover:scale-105 transform duration-300"
-              >
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors font-semibold hover:scale-105 transform duration-300"
+                >
                 <LogIn className="w-4 h-4" />
                 Already have an account? Sign in
               </button>
             </div>
-          </div>
-
-          {/* Demo Info */}
-          <div className="mt-6 text-center">
-            <p className="text-slate-500 text-sm font-medium">
-              Face Recognition Attendance System
-            </p>
           </div>
         </div>
       </main>

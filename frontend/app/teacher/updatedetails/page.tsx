@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -7,6 +8,8 @@ interface Student {
   _id: string;
   studentId: string;
   studentName: string;
+  buddhaName: string;
+  role: string;
   email: string;
   phoneNumber: string;
   status?: string;
@@ -17,6 +20,8 @@ interface Student {
 interface SearchFilters {
   studentId: string;
   studentName: string;
+  buddhaName: string;
+  role: string;
 }
 
 export default function TeacherUpdateStudentDetails() {
@@ -39,7 +44,9 @@ export default function TeacherUpdateStudentDetails() {
 
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     studentId: "",
-    studentName: ""
+    studentName: "",
+    buddhaName: "",
+    role: ""
   });
   useEffect(() => {
     const checkAuthStatus = () => {
@@ -74,19 +81,15 @@ export default function TeacherUpdateStudentDetails() {
   const clearFilters = () => {
     setSearchFilters({
       studentId: "",
-      studentName: ""
+      studentName: "",
+      buddhaName: "",
+      role: ""
     });
     setSearchResults([]);
     setStatus("");
   };
 
   const searchStudents = async () => {
-    const hasFilters = Object.values(searchFilters).some(value => value.trim() !== "");
-    
-    if (!hasFilters) {
-      setStatus("Please enter at least one search criteria");
-      return;
-    }
 
     setSearching(true);
     setStatus("");
@@ -115,7 +118,7 @@ export default function TeacherUpdateStudentDetails() {
       if (data.success) {
         setSearchResults(data.students);
         if (data.students.length === 0) {
-          setStatus("No students found matching your search criteria");
+          setStatus("No members found matching your search criteria");
         } else {
           setStatus(`Found ${data.students.length} student(s)`);
         }
@@ -187,6 +190,8 @@ export default function TeacherUpdateStudentDetails() {
         body: JSON.stringify({
           studentName: student.studentName,
           studentId: student.studentId,
+          buddhaName: student.buddhaName,
+          role: student.role,
           email: student.email,
           phoneNumber: student.phoneNumber
         }),
@@ -282,8 +287,8 @@ export default function TeacherUpdateStudentDetails() {
         {/* Header with Role-Aware Back Button */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Update Student Details</h1>
-            <p className="text-gray-600">Search and update any student's information</p>
+            <h1 className="text-3xl font-bold text-[#274e13]">Update Member Details</h1>
+            <p className="text-gray-600">Search and update any student&apos;s information</p>
           </div>
           <button
             onClick={() => router.push(dashboardPath)}
@@ -296,18 +301,18 @@ export default function TeacherUpdateStudentDetails() {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Advanced Search Panel */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">🔍 Advanced Search</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Search Filters</h3>
             
             <div className="space-y-4">
               {/* Student ID Search */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Student ID
+                  Member ID
                 </label>
                 <input
                   type="text"
                   name="studentId"
-                  placeholder="e.g., STU001"
+                  placeholder="e.g., 123"
                   value={searchFilters.studentId}
                   onChange={handleFilterChange}
                   className="w-full border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
@@ -317,13 +322,27 @@ export default function TeacherUpdateStudentDetails() {
               {/* Student Name Search */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Student Name
+                  Member Name
                 </label>
                 <input
                   type="text"
                   name="studentName"
                   placeholder="e.g., John Doe"
                   value={searchFilters.studentName}
+                  onChange={handleFilterChange}
+                  className="w-full border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Buddha Name
+                </label>
+                <input
+                  type="text"
+                  name="buddhaName"
+                  placeholder="e.g., 123"
+                  value={searchFilters.buddhaName}
                   onChange={handleFilterChange}
                   className="w-full border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
                 />
@@ -336,13 +355,13 @@ export default function TeacherUpdateStudentDetails() {
                   disabled={searching}
                   className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
-                  {searching ? "Searching..." : "🔍 Search Students"}
+                  {searching ? "Searching..." : "Search Members"}
                 </button>
                 <button
                   onClick={clearFilters}
                   className="w-full py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                 >
-                  🔄 Clear Filters
+                  Clear Filters
                 </button>
               </div>
             </div>
@@ -350,13 +369,12 @@ export default function TeacherUpdateStudentDetails() {
 
           {/* Search Results */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">📋 Search Results</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Search Results</h3>
             
             {searchResults.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <div className="text-4xl mb-4">👨‍🎓</div>
-                <p className="text-lg mb-2">No students found</p>
-                <p className="text-sm">Use the search filters to find students</p>
+                <p className="text-lg mb-2">No members found</p>
+                <p className="text-sm">Use the search filters to find members</p>
               </div>
             ) : (
               <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -382,13 +400,12 @@ export default function TeacherUpdateStudentDetails() {
 
           {/* Student Details Form */}
           <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">✏️ Student Information</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Member information</h3>
             
             {!student ? (
               <div className="text-center py-12 text-gray-500">
-                <div className="text-6xl mb-4">👨‍🎓</div>
-                <p className="text-lg mb-2">No student selected</p>
-                <p className="text-sm">Search for and select a student to view and edit their details</p>
+                <p className="text-lg mb-2">No member selected</p>
+                <p className="text-sm">Search for and select a member to view and edit their details</p>
               </div>
             ) : (
               <form onSubmit={handleUpdate} className="space-y-6">
@@ -430,9 +447,18 @@ export default function TeacherUpdateStudentDetails() {
                       required
                     />
                     <input
+                      name="buddhaName"
+                      type="text"
+                      placeholder="Buddha Name"
+                      value={student.buddhaName}
+                      onChange={handleInputChange}
+                      className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                    <input
                       name="studentId"
                       type="text"
-                      placeholder="Student ID"
+                      placeholder="Member ID"
                       value={student.studentId}
                       onChange={handleInputChange}
                       className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
@@ -456,7 +482,20 @@ export default function TeacherUpdateStudentDetails() {
                       className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    {/* Dropdown for Role/Membership */}
+                  <select
+                    name="role"
+                    value={student.role || ""} 
+                    onChange={handleInputChange}
+                    className="border border-gray-300 px-3 py-2 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 bg-white"
+                    required
+                  >
+                    <option value="" disabled>Select Status</option>
+                    <option value="member">Member</option>
+                    <option value="staff">Huynh Trưởng</option>
+                  </select>
                   </div>
+
                 </div>
 
 
@@ -467,7 +506,7 @@ export default function TeacherUpdateStudentDetails() {
                     disabled={updating || !hasChanges()}
                     className="flex-1 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
-                    {updating ? "Updating..." : "💾 Save Changes"}
+                    {updating ? "Updating..." : "Save Changes"}
                   </button>
                   <button
                     type="button"
@@ -475,7 +514,7 @@ export default function TeacherUpdateStudentDetails() {
                     disabled={!hasChanges()}
                     className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    🔄 Reset
+                    Reset
                   </button>
                   <button
                     type="button"
@@ -483,7 +522,7 @@ export default function TeacherUpdateStudentDetails() {
                     disabled={updating}
                     className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </form>
@@ -501,18 +540,6 @@ export default function TeacherUpdateStudentDetails() {
             {status}
           </div>
         )}
-
-        {/* Usage Instructions */}
-        <div className="mt-8 bg-yellow-50 border border-yellow-200 p-4 rounded-lg max-w-4xl mx-auto">
-          <h4 className="font-semibold text-yellow-800 mb-2">📋 Instructions</h4>
-          <ul className="text-sm text-yellow-700 space-y-1">
-            <li>• Use the advanced search filters to find students by ID, name, department, year, or division</li>
-            <li>• Click on a student from the search results to select and view their details</li>
-            <li>• Edit any field in the student information form and click "Save Changes"</li>
-            <li>• Use "Reset" to undo unsaved changes</li>
-            <li>• Be careful with the "Delete" option - it cannot be undone</li>
-          </ul>
-        </div>
       </div>
     </main>
   );

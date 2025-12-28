@@ -30,13 +30,13 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
   const [cameraError, setCameraError] = useState<string>("");
 
     const startCamera = async () => {
+
       try {
         setCameraStatus("loading");
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
         });
         if (videoRef.current) videoRef.current.srcObject = stream;
-        console.log(videoRef.current)
         setCameraStatus("active");
       } catch (err) {
         console.error("Camera error:", err);
@@ -52,6 +52,11 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     stream?.getTracks().forEach((track) => track.stop());
     if (videoRef.current) videoRef.current.srcObject = null;
     if (intervalRef.current) clearInterval(intervalRef.current);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
     setCameraStatus("stopped");
     console.log("camera stopped")
   };
@@ -91,9 +96,10 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
   };
 
   useEffect(() => {
-    if (singleShot || isLiveMode) startCamera();
+    console.log("camera effect")
+    if (singleShot) startCamera();
     return () => stopCamera();
-  }, [singleShot, isLiveMode]);
+  }, [singleShot]);
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -108,29 +114,41 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
   }, [captureIntervalMs, isLiveMode, cameraStatus, facesData]);
 
   return (
-    <div className="relative w-full max-w-md">
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        className={`rounded-lg shadow-md w-full ${cameraStatus === "active" ? "block" : "hidden"}`}
-        style={{ maxHeight: "360px" }}
-      />
-      <canvas ref={canvasRef} className="absolute top-0 left-0 rounded-lg w-full" />
-      {cameraStatus === "stopped" && !cameraError && (
-        <button
-          onClick={startCamera}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Start Camera
-        </button>
-      )}
-      {cameraError && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-600">
-          {cameraError}
-        </div>
-      )}
+    <div>
+      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden shadow-xl">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          className={`w-full h-full object-cover ${cameraStatus === "active" ? "block" : "hidden"}`}
+        />
+        <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+        
+        {cameraStatus === "loading" && (
+          <div className="absolute inset-0 flex items-center justify-center text-white">Initializing...</div>
+        )}
+      </div>
+
+      <div className="flex gap-2 justify-center">
+        {cameraStatus === "stopped" ? (
+          <button
+            onClick={startCamera}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+          >
+            Turn Camera On
+          </button>
+        ) : (
+          <button
+            onClick={stopCamera}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+          >
+            Turn Camera Off
+          </button>
+        )}
+      </div>
+
+      {cameraError && <p className="text-red-500 text-sm">{cameraError}</p>}
     </div>
   );
 };

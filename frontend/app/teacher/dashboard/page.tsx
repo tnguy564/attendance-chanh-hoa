@@ -1,4 +1,5 @@
 "use client";
+import mainLogo from '../../gdptlogo.png';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -64,31 +65,31 @@ export default function TeacherDashboard() {
 
   const teacherMenuItems = [
     {
-      title: "Student Registration",
-      description: "Register new students with complete details and face recognition setup",
+      title: "Member Registration",
+      description: "Register new members with complete details and face recognition setup",
       icon: <Users className="w-7 h-7" />,
-      path: "/student/registrationform",
+      path: "/teacher/registrationform",
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50 hover:bg-blue-100",
-      borderColor: "border-blue-200 hover:border-blue-300"
+      borderColor: "border-[#212121] hover:[#212121]"
     },
     {
-      title: "Update Student Details",
-      description: "Modify existing student information and profile settings",
+      title: "Update Member Details",
+      description: "Modify existing member information and profile settings",
       icon: <Edit3 className="w-7 h-7" />,
-      path: "/student/updatedetails",
+      path: "/teacher/updatedetails",
       color: "from-emerald-500 to-emerald-600",
-      bgColor: "bg-emerald-50 hover:bg-emerald-100",
-      borderColor: "border-emerald-200 hover:border-emerald-300"
+      bgColor: "bg-white hover:bg-white",
+      borderColor: "border-[#212121] hover:[#212121]"
     },
     {
-      title: "Start Teaching Session",
+      title: "Start A Session",
       description: "Begin a live attendance session with face recognition",
       icon: <Camera className="w-7 h-7" />,
       path: "/teacher/start-session",
       color: "from-purple-500 to-purple-600",
       bgColor: "bg-purple-50 hover:bg-purple-100",
-      borderColor: "border-purple-200 hover:border-purple-300"
+      borderColor: "border-[#212121] hover:[#212121]"
     },
     {
       title: "Attendance Records",
@@ -97,7 +98,7 @@ export default function TeacherDashboard() {
       path: "/teacher/view-attendance",
       color: "from-amber-500 to-orange-500",
       bgColor: "bg-amber-50 hover:bg-amber-100",
-      borderColor: "border-amber-200 hover:border-amber-300"
+      borderColor: "border-[#212121] hover:[#212121]"
     }
   ];
 
@@ -117,9 +118,9 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg border-b border-slate-200 shadow-sm">
+      <header className="bg-[#212121] border-b border-slate-200 shadow-sm">
         <div className="px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left Section */}
@@ -133,13 +134,11 @@ export default function TeacherDashboard() {
               </button>
               
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
+              <img  src={mainLogo.src} className="w-20 h-25 object-contain"/>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Teacher Dashboard</h1>
-                  <p className="text-slate-600 text-sm font-medium">Welcome back, {teacherName}</p>
-                  {employeeId && <p className="text-slate-500 text-xs">ID: {employeeId}</p>}
+                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Admin Dashboard</h1>
+                  <p className="text-white text-sm font-medium">Welcome back, {teacherName}</p>
+                  {employeeId && <p className="text-white text-xs">ID: {employeeId}</p>}
                 </div>
               </div>
             </div>
@@ -192,16 +191,11 @@ export default function TeacherDashboard() {
         <div className="max-w-7xl mx-auto">
           {/* Welcome Message */}
           <div className="mb-12 text-center">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Teacher Dashboard</span>
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-3 tracking-tight">
-              Teacher Management Hub
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#274e13] mb-3 tracking-tight">
+              GĐPT Chánh Hòa Attendance Hub
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
-              Manage student registrations, conduct sessions, and monitor attendance with advanced face recognition technology
+              Manage member registrations, conduct sessions, and monitor attendance with advanced face recognition technology
             </p>
           </div>
 
@@ -237,13 +231,7 @@ export default function TeacherDashboard() {
                   <p className="text-slate-600 text-sm mb-6 leading-relaxed line-clamp-3">
                     {item.description}
                   </p>
-                  
-                  <div className={`inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r ${item.color} text-white font-semibold text-sm transition-all duration-300 group-hover:gap-3 group-hover:shadow-lg group-hover:scale-105`}>
-                    Get Started
-                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+                
                 </div>
 
                 {/* Decorative Elements */}

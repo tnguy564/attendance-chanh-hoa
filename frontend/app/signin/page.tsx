@@ -1,4 +1,6 @@
 "use client";
+import mainLogo from "../gdptlogo.jpg";
+
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,7 +21,7 @@ export default function SignInPage() {
   const [formData, setFormData] = useState({ 
     email: "", 
     password: "",
-    userType: "student" // Default to student
+    userType: "teacher" // Default to student
   });
   const [status, setStatus] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -100,9 +102,6 @@ export default function SignInPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-              <LogIn className="w-6 h-6 text-white" />
-            </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Welcome Back</h1>
           </div>
           <p className="text-slate-600 text-sm font-medium">Sign in to your account to continue</p>
@@ -111,40 +110,6 @@ export default function SignInPage() {
         {/* Sign In Form */}
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border-2 border-slate-200 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* User Type Selection */}
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <label className="block text-slate-700 text-sm font-semibold mb-3 flex items-center gap-2">
-                <User className="w-4 h-4 text-blue-600" />
-                Sign in as:
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, userType: "student" }))}
-                  className={`p-3 rounded-xl border-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold hover:scale-105 ${
-                    formData.userType === "student" 
-                      ? "bg-blue-50 border-blue-300 text-blue-700 shadow-lg" 
-                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  Student
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, userType: "teacher" }))}
-                  className={`p-3 rounded-xl border-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold hover:scale-105 ${
-                    formData.userType === "teacher" 
-                      ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-lg" 
-                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Teacher
-                </button>
-              </div>
-            </div>
-
             {/* Email Input */}
             <div>
               <label className="block text-slate-700 text-sm font-semibold mb-2">
@@ -208,7 +173,7 @@ export default function SignInPage() {
               ) : (
                 <>
                   <LogIn className="w-5 h-5" />
-                  Sign In as {formData.userType === 'teacher' ? 'Teacher' : 'Student'}
+                  Sign In as Admin
                 </>
               )}
             </button>
@@ -238,13 +203,6 @@ export default function SignInPage() {
               Create new account
             </button>
           </div>
-        </div>
-
-        {/* Demo Info */}
-        <div className="mt-6 text-center">
-          <p className="text-slate-500 text-sm font-medium">
-            Face Recognition Attendance System
-          </p>
         </div>
       </div>
     </div>
