@@ -228,4 +228,4 @@ tzdata==2025.3
 urllib3==2.6.2
 Werkzeug==3.1.4
 wheel==0.45.1
-wrapt==2.0.1
+wrapt==2.0.1git
