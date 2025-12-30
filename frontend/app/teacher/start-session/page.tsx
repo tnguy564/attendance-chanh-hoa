@@ -3,9 +3,12 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, ArrowLeft, Play, Square, User, Calendar, BookOpen, GraduationCap, Users, CheckCircle2 } from "lucide-react";
-import CameraCapture, { FaceData } from "../../components/CameraCapture";
-
+import { Camera, ArrowLeft, Play, Square, User, Calendar, BookOpen, Users, CheckCircle2 } from "lucide-react";
+export interface FaceData {
+  box: [number, number, number, number];
+  match: { user_id: string; name: string } | null;
+  confidence?: number;
+}
 export default function DemoSessionPage() {
   const router = useRouter();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -97,8 +100,8 @@ export default function DemoSessionPage() {
   };
 
   const endSessionAndNavigate = async () => {
-    if (confirmText.toLowerCase() !== "confirm") {
-      setStatus("Please type 'confirm' to finalize.");
+    if (confirmText.toLowerCase() !== "sudo") {
+      setStatus("Please type the secret word to finalize.");
       return;
     }
     // 1. Show the confirmation dialog
@@ -283,7 +286,7 @@ export default function DemoSessionPage() {
           <div className="flex items-center gap-2 bg-white/50 p-1 rounded-lg border border-blue-200">
             <input
               type="text"
-              placeholder="Type 'confirm'"
+              placeholder="Type the secret code"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               className="text-black font-medium px-3 py-2 rounded-md border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
