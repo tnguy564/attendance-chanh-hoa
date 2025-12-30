@@ -242,10 +242,6 @@ def export_attendance():
 
         # Stats computed against roster size
         student_filter = roster_filter
-        total_students = students_col.count_documents(student_filter) if student_filter else 0
-        present_count = sum(1 for r in attendance_list if r.get("status") == "present")
-        absent_count = max(total_students - present_count, 0)
-        attendance_rate = round((present_count / total_students * 100) if total_students > 0 else 0, 1)
         """
         return jsonify({
             "success": True,

@@ -12,10 +12,10 @@ export interface FaceData {
 export default function DemoSessionPage() {
   const router = useRouter();
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [sessionActive, setSessionActive] = useState(false);
   const [recognitionStarted, setRecognitionStarted] = useState(false);
   const [status, setStatus] = useState("");
   const [facesData, setFacesData] = useState<FaceData[]>([]);
+
   const [recognizedStudents, setRecognizedStudents] = useState<string[]>([]);
   const [confirmText, setConfirmText] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -25,6 +25,7 @@ export default function DemoSessionPage() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [cameraStatus, setCameraStatus] = useState<"loading" | "active" | "stopped">("stopped");
   const [cameraError, setCameraError] = useState<string>("");
+
 
   const startCamera = async () => {
     try {
@@ -49,6 +50,50 @@ export default function DemoSessionPage() {
     setCameraStatus("stopped");
     
   };
+
+  const captureAndRecognize = useCallback(async () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || cameraStatus !== "active") return;
+
+    // 1. Prepare Canvas
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // 2. Take Snapshot
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+
+    // 3. Send to API
+    const payload: any = { image: imageDataUrl };
+    if (sessionId) payload.session_id = sessionId;
+
+    try {
+      const res = await fetch("http://localhost:5000/api/attendance/real-mark", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.faces && data.faces.length > 0) {
+        setFacesData(data.faces);
+        const face = data.faces[0];
+        if (face.match) {
+          setStatus(`✅ Recognized ${face.match.name}`);
+          setRecognizedStudents((prev) => 
+            prev.includes(face.match.name) ? prev : [...prev, face.match.name]
+          );
+        }
+      } else {
+        setFacesData([]);
+      }
+    } catch (err) {
+      console.error("Recognition error:", err);
+    }
+  }, [sessionId, cameraStatus]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -75,6 +120,48 @@ export default function DemoSessionPage() {
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas || facesData.length === 0) {
+        if(canvas) {
+            const ctx = canvas.getContext("2d");
+            ctx?.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
+    }
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    facesData.forEach((face) => {
+      const [x, y, w, h] = face.box;
+      ctx.strokeStyle = face.match ? "#00ff00" : "#ff0000";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x, y, w, h);
+
+      ctx.fillStyle = face.match ? "#00ff00" : "#ff0000";
+      ctx.font = "bold 16px Arial";
+      const label = face.match ? face.match.name : "Unknown";
+      ctx.fillText(label, x, y > 20 ? y - 10 : y + 20);
+    });
+  }, [facesData]);
+
+  useEffect(() => {
+    if (recognitionStarted && cameraStatus === "active") {
+      intervalRef.current = setInterval(captureAndRecognize, 2000); // 2 seconds
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [recognitionStarted, cameraStatus, captureAndRecognize]);
+
+  
 
   const handleToggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -154,7 +241,6 @@ export default function DemoSessionPage() {
       if (data.session_id) {
         setSessionId(data.session_id);
         setStatus("✅ Session created! Click Start Recognition.");
-        setSessionActive(true);
       } else {
         setStatus("❌ Failed to create session");
       }
@@ -293,9 +379,9 @@ export default function DemoSessionPage() {
             />
             <button
               onClick={endSessionAndNavigate}
-              disabled={confirmText.toLowerCase() !== "confirm"}
+              disabled={confirmText.toLowerCase() !== "sudo"}
               className={`px-3 py-1 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md 
-                ${confirmText.toLowerCase() === "confirm" 
+                ${confirmText.toLowerCase() === "sudo" 
                   ? "bg-blue-600 text-white hover:bg-blue-700 border-2 border-blue-700 hover:-translate-y-0.5" 
                   : "bg-gray-200 text-gray-400 border-2 border-gray-300 cursor-not-allowed"}`}
             >
