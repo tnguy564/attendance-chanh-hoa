@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, ArrowLeft, Play, Square, User, Calendar, BookOpen, GraduationCap, Users, CheckCircle2 } from "lucide-react";
 import CameraCapture, { FaceData } from "../../components/CameraCapture";
@@ -16,6 +16,36 @@ export default function DemoSessionPage() {
   const [recognizedStudents, setRecognizedStudents] = useState<string[]>([]);
   const [confirmText, setConfirmText] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [cameraStatus, setCameraStatus] = useState<"loading" | "active" | "stopped">("stopped");
+  const [cameraError, setCameraError] = useState<string>("");
+
+  const startCamera = async () => {
+    try {
+      setCameraStatus("loading");
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" },
+      });
+      if (videoRef.current) videoRef.current.srcObject = stream;
+      setCameraStatus("active");
+    } catch (err) {
+      console.error("Camera error:", err);
+      setCameraError("Failed to access camera.");
+      setCameraStatus("stopped");
+    }
+  };
+
+  const stopCamera = () => {
+    const stream = videoRef.current?.srcObject as MediaStream;
+    stream?.getTracks().forEach((track) => track.stop());
+    if (videoRef.current) videoRef.current.srcObject = null;
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setCameraStatus("stopped");
+    
+  };
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -172,11 +202,13 @@ export default function DemoSessionPage() {
 
   const handleStartRecognition = () => {
     setRecognitionStarted(true);
+    startCamera();
     setStatus("Turn on camera when ready");
   };
 
   const handleStopRecognition = () => {
     setRecognitionStarted(false);
+    stopCamera();
     setStatus("Recognition stopped");
   };
 
@@ -238,6 +270,15 @@ export default function DemoSessionPage() {
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
       {/* Left Controls */}
       <div className="flex flex-wrap gap-3 items-center">
+        {sessionId && recognitionStarted && (
+        <button
+          onClick={handleStopRecognition}
+          className="px-6 py-3 rounded-lg font-semibold bg-red-100 hover:bg-red-200 text-red-700 border-2 border-red-300 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-md hover:-translate-y-0.5"
+        >
+          <Square className="w-5 h-5" />
+          Stop Recognition
+        </button>
+      )}
         {sessionId && (
           <div className="flex items-center gap-2 bg-white/50 p-1 rounded-lg border border-blue-200">
             <input
@@ -430,12 +471,30 @@ export default function DemoSessionPage() {
                   </div>
                 ) : (
                   <div className="relative rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                    <CameraCapture
-                      isLiveMode={true}
-                      onCapture={handleRecognize}
-                      facesData={facesData}
-                      captureIntervalMs={2000}
-                    />
+                    <div className="relative w-full max-w-md">
+                          <video
+                            ref={videoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            className={`rounded-lg shadow-md w-full ${cameraStatus === "active" ? "block" : "hidden"}`}
+                            style={{ maxHeight: "360px" }}
+                          />
+                          <canvas ref={canvasRef} className="absolute top-0 left-0 rounded-lg w-full" />
+                          {cameraStatus === "stopped" && !cameraError && (
+                            <button
+                              onClick={startCamera}
+                              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white px-4 py-2 rounded"
+                            >
+                              Start Camera
+                            </button>
+                          )}
+                          {cameraError && (
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-600">
+                              {cameraError}
+                            </div>
+                          )}
+                        </div>
                   </div>
                 )}
               </div>
