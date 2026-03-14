@@ -1,5 +1,4 @@
 "use client";
-import mainLogo from "../gdptlogo.jpg";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,10 +7,6 @@ import {
   Mail, 
   Lock, 
   User, 
-  GraduationCap, 
-  BookOpen,
-  ArrowLeft,
-  Home,
   LogIn
 } from "lucide-react";
 
@@ -36,7 +31,7 @@ export default function SignUpPage() {
     setStatus("Registering...");
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/api/signup", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -72,7 +67,7 @@ export default function SignUpPage() {
             <div className="flex items-center gap-4">
               
               <div className="flex items-center gap-3">
-              <img  src={mainLogo.src} className="w-20 h-25 object-contain"/>
+              <img  src="../gdptlogo.png" className="w-20 h-25 object-contain"/>
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Sign Up</h1>
                   <p className="text-slate-600 text-sm font-medium">Create your account to get started</p>

@@ -3,12 +3,15 @@ import os
 import time
 import logging
 import threading
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 import numpy as np
+# Logging setup
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Blueprint imports
 from auth.routes import auth_bp
@@ -16,42 +19,55 @@ from auth.routes import auth_bp
 # Optional student/teacher blueprints
 try:
     from student.registration import student_registration_bp
-except ImportError:
+except ImportError as e:
+    logger.error(f"❌ Failed to import student_registration_bp: {e}")
     student_registration_bp = None
 
 try:
     from student.updatedetails import student_update_bp
-except ImportError:
+except ImportError as e:
+    logger.error(f"❌ Failed to import student_update_bp: {e}")
     student_update_bp = None
 
 try:
     from student.demo_session import demo_session_bp
-except ImportError:
+except ImportError as e:
+    logger.error(f"❌ Failed to import demo_session_bp: {e}")
     demo_session_bp = None
 
 try:
     from student.view_attendance import attendance_bp
-except ImportError:
+except ImportError as e:
+    logger.error(f"❌ Failed to import attendance_bp: {e}")
     attendance_bp = None
 
 try:
     from teacher.attendance_records import attendance_session_bp
-except ImportError:
+except ImportError as e:
+    logger.error(f"❌ Failed to import attendance_session_bp: {e}")
     attendance_session_bp = None
 
-# Logging setup
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 
 load_dotenv()
 
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+uri = os.getenv("MONGO_URI")
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
 # MongoDB setup
-MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017/")
 DB_NAME = os.getenv("DATABASE_NAME", "facerecognition")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME", "students")
 THRESHOLD = float(os.getenv("THRESHOLD", "0.6"))
 
-client = MongoClient(MONGODB_URI)
+# client = MongoClient(MONGODB_URI)
 db = client[DB_NAME]
 students_collection = db[COLLECTION_NAME]
 attendance_db = client["facerecognition_db"]
@@ -169,7 +185,16 @@ model_manager = ModelManager()
 
 # Flask app
 app = Flask(__name__)
-CORS(app)
+
+# Simple CORS configuration - allow all origins for development
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Handle all OPTIONS requests globally
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = app.make_default_options_response()
+        return response
 
 # Configure Flask app with database and model instances
 app.config["DB"] = db
@@ -232,7 +257,7 @@ if __name__ == "__main__":
     # Final model verification before starting
     if model_manager.is_ready():
         logger.info("🎯 All systems ready! Server starting on http://0.0.0.0:5000")
-        app.run(host="0.0.0.0", port=5000, debug=False)  # Set debug=False for production
+        app.run(host="0.0.0.0", port=5000, debug=True)  # Set debug=False for production
     else:
         logger.error("❌ Cannot start server - models not ready")
         exit(1)

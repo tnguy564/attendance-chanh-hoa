@@ -9,10 +9,27 @@ from mtcnn import MTCNN
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import logging
+import os
+from dotenv import load_dotenv
 
+# Load .env file
+load_dotenv() # Reads variables from the .env file and sets them in os.environ
+
+# Access environment variables using os.getenv() or os.environ[]
+uri = os.getenv("MONGO_URI")
 student_registration_bp = Blueprint("student_registration", __name__)
-client = MongoClient("MONGODB_URI")
-db = client["DATABASE_NAME"]
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+db = client["facerecognition"]
 students_collection = db["students"]
 detector = MTCNN()
 logger = logging.getLogger(__name__)
